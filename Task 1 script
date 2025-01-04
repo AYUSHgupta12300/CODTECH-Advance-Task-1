@@ -1,0 +1,59 @@
+import requests
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Function to fetch weather data
+def fetch_weather_data(api_key, city):
+    url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&units=metric&appid={api_key}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        print(f"Failed to fetch data. HTTP Status Code: {response.status_code}")
+        return None
+
+# Function to process weather data
+def process_weather_data(data):
+    weather_list = data['list']
+    timestamps = [item['dt_txt'] for item in weather_list]
+    temperatures = [item['main']['temp'] for item in weather_list]
+    humidities = [item['main']['humidity'] for item in weather_list]
+    return timestamps, temperatures, humidities
+
+# Function to create visualizations
+def create_visualizations(timestamps, temperatures, humidities):
+    sns.set(style="darkgrid")
+    
+    # Plot temperatures
+    plt.figure(figsize=(12, 6))
+    plt.plot(timestamps, temperatures, label='Temperature (°C)', color='blue', marker='o')
+    plt.xticks(rotation=45, fontsize=8)
+    plt.title("Temperature Over Time")
+    plt.xlabel("Timestamp")
+    plt.ylabel("Temperature (°C)")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+    
+    # Plot humidities
+    plt.figure(figsize=(12, 6))
+    plt.plot(timestamps, humidities, label='Humidity (%)', color='green', marker='o')
+    plt.xticks(rotation=45, fontsize=8)
+    plt.title("Humidity Over Time")
+    plt.xlabel("Timestamp")
+    plt.ylabel("Humidity (%)")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+# Main script
+if _name_ == "_main_":
+    # Replace with your OpenWeatherMap API key
+    api_key = "your_openweathermap_api_key"
+    city = "London"  # Replace with your desired city
+    
+    data = fetch_weather_data(api_key, city)
+    if data:
+        timestamps, temperatures, humidities = process_weather_data(data)
+        create_visualizations(timestamps[:10], temperatures[:10], humidities[:10])  # Show first 10 data points
